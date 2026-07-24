@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Semgrep SAST Scan
-        run: semgrep scan --config auto --metrics=off --oss-only --suppress-errors --sarif --sarif-output=results.sarif
+        run: semgrep scan --config auto --metrics=off --sarif --sarif-output=results.sarif
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
