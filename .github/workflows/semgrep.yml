@@ -19,11 +19,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Semgrep SAST Scan
-        run: semgrep scan --config p/default --metrics=off --sarif --sarif-output=results.sarif
+        run: semgrep scan --config p/default --metrics=off --sarif --sarif-output=results.sarif --baseline-commit "${{ github.event.pull_request.base.sha }}"
 
       - name: Upload SARIF file
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
