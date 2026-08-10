@@ -11,7 +11,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gfleury/go-bitbucket-v1 v0.0.0-20240917142304-df385efaac68
 	github.com/go-enry/go-enry/v2 v2.9.1
-	github.com/go-git/go-git/v5 v5.19.1
+	github.com/go-git/go-git/v5 v5.19.2
 	github.com/gobwas/glob v0.2.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v78 v78.0.0
@@ -49,10 +49,10 @@ require (
 	go.opentelemetry.io/otel/trace v1.43.0
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.6.0
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.56.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.21.0
-	golang.org/x/sys v0.45.0
+	golang.org/x/sys v0.46.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	pgregory.net/rapid v1.2.0
@@ -137,7 +137,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.52.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/text v0.39.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.217.0 // indirect
