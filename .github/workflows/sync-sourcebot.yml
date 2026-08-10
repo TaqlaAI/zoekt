@@ -24,6 +24,7 @@ jobs:
           private-key: ${{ secrets.SOURCEBOT_SYNC_APP_PRIVATE_KEY }}
           owner: sourcebot-dev
           repositories: sourcebot
+          permission-contents: write
 
       - name: Request Sourcebot dependency update
         env:
