@@ -97,6 +97,32 @@ func TestBuildv16(t *testing.T) {
 	}
 }
 
+func TestBuilderFinishPreservesShardPublishError(t *testing.T) {
+	indexDir := t.TempDir()
+	opts := Options{
+		IndexDir: indexDir,
+		RepositoryDescription: zoekt.Repository{
+			Name: "repo",
+		},
+		DisableCTags: true,
+	}
+
+	b, err := NewBuilder(opts)
+	require.NoError(t, err)
+	require.NoError(t, b.AddFile("main.go", []byte("package main")))
+
+	// A non-empty directory at the final shard path makes both publishing the
+	// new shard and cleaning up the apparent old shard fail. The publish error
+	// is the useful root cause and must not be overwritten by the cleanup error.
+	finalPath := b.opts.shardName(0)
+	require.NoError(t, os.Mkdir(finalPath, 0o755))
+	require.NoError(t, os.WriteFile(filepath.Join(finalPath, "keep"), nil, 0o644))
+
+	err = b.Finish()
+	require.ErrorContains(t, err, "publishing shard")
+	require.ErrorContains(t, err, finalPath)
+}
+
 func TestFlags(t *testing.T) {
 	cases := []struct {
 		args []string

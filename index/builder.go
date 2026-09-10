@@ -669,6 +669,11 @@ func (b *Builder) Finish() error {
 
 	b.flush()
 	b.building.Wait()
+	recordBuildError := func(err error) {
+		if err != nil && b.buildError == nil {
+			b.buildError = err
+		}
+	}
 
 	if b.buildError != nil {
 		for tmp := range b.finishedShards {
@@ -766,7 +771,7 @@ func (b *Builder) Finish() error {
 		for _, name := range oldShards {
 			paths, err := IndexFilePaths(name)
 			if err != nil {
-				b.buildError = fmt.Errorf("failed to find old paths for %s: %w", name, err)
+				recordBuildError(fmt.Errorf("failed to find old paths for %s: %w", name, err))
 			}
 			for _, p := range paths {
 				toDelete[p] = struct{}{}
@@ -776,7 +781,16 @@ func (b *Builder) Finish() error {
 
 	for tmp, final := range artifactPaths {
 		if err := os.Rename(tmp, final); err != nil {
-			b.buildError = err
+			log.Printf(
+				"failed to publish shard: rename %q to %q: %T: %v; temporary path: %s; final path: %s",
+				tmp,
+				final,
+				err,
+				err,
+				fileState(tmp),
+				fileState(final),
+			)
+			recordBuildError(fmt.Errorf("publishing shard: rename %q to %q: %w", tmp, final, err))
 			continue
 		}
 
@@ -791,17 +805,25 @@ func (b *Builder) Finish() error {
 			if !strings.HasSuffix(p, ".zoekt") {
 				continue
 			}
-			err := SetTombstone(p, b.opts.RepositoryDescription.ID)
-			b.buildError = err
+			recordBuildError(SetTombstone(p, b.opts.RepositoryDescription.ID))
 			continue
 		}
 		log.Printf("removing old shard file: %s", p)
 		if err := os.Remove(p); err != nil {
-			b.buildError = err
+			recordBuildError(fmt.Errorf("removing old shard file %q: %w", p, err))
 		}
 	}
 
 	return b.buildError
+}
+
+func fileState(path string) string {
+	info, err := os.Lstat(path)
+	if err != nil {
+		return fmt.Sprintf("stat error: %v", err)
+	}
+
+	return fmt.Sprintf("mode=%s size=%d modtime=%s", info.Mode(), info.Size(), info.ModTime().Format(time.RFC3339Nano))
 }
 
 // BranchNamesEqual compares the given zoekt.RepositoryBranch slices, and returns true
